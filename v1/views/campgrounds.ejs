@@ -1,0 +1,16 @@
+<style>
+    img{
+        width: 300px;
+        height: 300px;
+    }
+</style>
+<!-- temp style -->
+
+<h1>This is the Campgrounds Page</h1>
+
+<% campgrounds.forEach((cg) => { %>
+    <div>
+        <h4><%=cg.name %></h4>
+    <img src=" <%=cg.image %>" alt="">
+    </div>
+<% }) %>
