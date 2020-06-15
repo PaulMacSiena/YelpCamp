@@ -1,3 +1,5 @@
+<%- include("partials/header") %>
+
 <style>
     img{
         width: 300px;
@@ -11,6 +13,8 @@
 <% campgrounds.forEach((cg) => { %>
     <div>
         <h4><%=cg.name %></h4>
-    <img src=" <%=cg.image %>" alt="">
+    <img src="<%=cg.image %>" alt="">
     </div>
 <% }) %>
+
+<%- include("partials/footer") %>
