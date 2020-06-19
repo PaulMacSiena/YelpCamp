@@ -1,0 +1,49 @@
+<%- include("../partials/header") %>
+
+<% if (cg){ %>
+
+<div class="row">
+    <div class="col-md-3">
+        <p class = "lead">YelpCamp</p>
+        <div class="list-group">
+            <li class = "list-group-item active">Info 1</li>
+            <li class = "list-group-item">Info 2</li>
+            <li class = "list-group-item">Info 3</li>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="thumbnail">
+            <img class = "image-responsive" src="<%= cg.image %>" alt="">
+            <div class="caption">
+                <h4 class = "pull-right">$9.00/night</h4>
+                <h4><a href="#"><%= cg.name %></a></h4>
+                <p><%= cg.description %></p>
+            </div>
+        </div>
+        <div class="well">
+            <div class="text-right">
+                <a class = "btn btn-success" href="/campgrounds/<%=cg._id%>/comments/new">Leave a Review</a>
+            </div>
+            <hr>
+            <% cg.comments.forEach((comment) => { %>
+                <div class="row">
+                    <div class="col-md-12">
+                        <strong><%=comment.author%></strong>
+                        <span class = "pull-right">10 days ago</span>
+                        <p>
+                            <%=comment.text%>
+                        </p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+<% } else {%>
+    <h1>Could not find campground</h1>
+    <a href="/campgrounds">Go Back</a>
+
+<%} %>
+
+<%- include("../partials/footer") %>
