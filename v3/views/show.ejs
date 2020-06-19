@@ -1,0 +1,27 @@
+<%- include("partials/header") %>
+
+<style> 
+img{
+    width: 300px;
+    height: 300px;
+}
+</style>
+<% if (cg){ %>
+<h1><%= cg.name %></h1>
+
+<img src="<%= cg.image %>" alt="">
+
+<p><%= cg.description %></p>
+
+<% cg.comments.forEach((comment) => { %>
+<p>
+    <strong><%=comment.author%></strong> - <%=comment.text%>
+</p>
+<% }) %>
+
+<%- include("partials/footer") %>
+<% } else {%>
+    <h1>Could not find campground</h1>
+    <a href="/campgrounds">Go Back</a>
+
+<%} %>
