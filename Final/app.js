@@ -3,11 +3,16 @@ app  = express(),
 port = 3000,
 parser = require("body-parser"),
 mongoose = require("mongoose"),
-Campground = require("./models/campground");
+passort = require("passport"),
+LocalStategy =require("passport-local"),
+Campground = require("./models/campground"),
+User = require("./models/user"),
 Comment = require("./models/comment");
 
 let seedDB = require("./seeds");
 const campground = require("./models/campground");
+const passport = require("passport");
+const { findOneAndDelete } = require("./models/user");
 
 //seedDB();
 
@@ -18,7 +23,24 @@ mongoose.set('useUnifiedTopology', true);
 
 mongoose.connect('mongodb://localhost/yelpcamp', {useNewUrlParser: true});
 
+//setup passport
+app.use(require("express-session")({
+    secret: "Once again Rusty wins cutest dog",
+    resave: false,
+    saveUninitialized: false
+}))
+
+app.use(passort.initialize());
+app.use(passort.session());
+passort.use(new LocalStategy(User.authenticate()));
+passort.serializeUser(User.serializeUser());
+passort.deserializeUser(User.deserializeUser());
 //schema
+
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+})
 
 app.use(parser.urlencoded({extended: true}));
 
@@ -78,7 +100,7 @@ app.get("/campgrounds/:id", (req,res) =>{
             console.log(err);
         }
         else{
-            console.log(foundCampground);
+            //console.log(foundCampground);
             res.render("campgrounds/show", {cg: foundCampground});
         }
     });
@@ -86,7 +108,7 @@ app.get("/campgrounds/:id", (req,res) =>{
     
 })
 
-app.get("/campgrounds/:id/comments/new", (req, res) => {
+app.get("/campgrounds/:id/comments/new", isLoggedIn, (req, res) => {
     Campground.findById(req.params.id,(err, campground) => {
         if (err){
             console.log(err);
@@ -119,8 +141,51 @@ app.post("/campgrounds/:id/comments", (req,res) => {
         }
     })
 })
+
+//auth routes
+app.get("/register",(req,res) => {
+    res.render("register");
+})
+
+app.post("/register",isLoggedIn,(req,res) => {
+    let newUser = new User({username: req.body.username})
+    User.register(new User(newUser),req.body.password, (err, user) => {
+        if (err){
+            console.log(err);
+            return res.render("register");
+        }
+        passport.authenticate("local")(req, res, () => {
+            res.redirect("/campgrounds");
+        })
+    });
+})
+
+app.get("/login",(req,res) => {
+    res.render("login");
+})
+
+app.post("/login", passort.authenticate("local",
+{
+    successRedirect: "/campgrounds",
+    failureRedirect: "/login"
+}),(req, res) => {
+   //nothing for now 
+});
+
+app.get("/logout",(req,res) => {
+    req.logout();
+    res.redirect("/campgrounds");
+})
+
 app.get("*", (req, res) => {
     res.send(`http://localhost:${port}` + req.url + " does not exist on this app");
 })
+
+function isLoggedIn(req,res, next){
+    if (req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+}
 
 app.listen(port, () => console.log(`YelpCamp App listening on http://localhost:${port}`));
