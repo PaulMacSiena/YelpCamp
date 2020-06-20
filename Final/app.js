@@ -5,6 +5,7 @@ const express = require("express"),
       mongoose = require("mongoose"),
       passport = require("passport"),
       User = require("./models/user"),
+      methodOverride = require("method-override"),
       LocalStategy =require("passport-local");
 
 //set up routers
@@ -23,6 +24,9 @@ app.use(parser.urlencoded({extended: true}));
 
 //set up dir for css and extra js
 app.use(express.static(__dirname+'/public'));
+
+//method override for put and delete requests
+app.use(methodOverride("_method"));
 
 //configure mongoose
 mongoose.set('useNewUrlParser', true);

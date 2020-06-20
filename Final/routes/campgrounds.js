@@ -65,6 +65,41 @@ router.get("/:id", (req,res) =>{
     
 })
 
+//edit form
+router.get("/:id/edit", (req, res) => {
+    Campground.findById(req.params.id,(err, cg) => {
+        if (err){
+            console.log(err);
+            res.redirect("/campgrounds/:id")
+        }
+        else{
+            res.render("campgrounds/edit",{cg: cg});
+        }
+    })
+})
+
+//update camground 
+router.put("/:id", (req, res) => {
+    Campground.findByIdAndUpdate(req.params.id,req.body.cg, (err, updatedCG) => {
+        if(err){
+            res.redirect("/campgrounds");
+        }
+        else{
+            res.redirect("/campgrounds/" + req.params.id)
+        }
+    })
+})
+
+//destroy cg
+router.delete("/:id", (req, res) => {
+    Campground.findByIdAndDelete(req.params.id, (err) => {
+        if (err){
+            console.log(err);
+        }
+        res.redirect("/campgrounds");
+    })
+})
+
 //middleware for checking authentication/ if user is logged in
 function isLoggedIn(req,res, next){
     if (req.isAuthenticated()){
