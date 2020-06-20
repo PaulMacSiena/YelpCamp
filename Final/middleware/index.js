@@ -7,9 +7,11 @@ middleWareObj.checkCampgroundOwnership = (req, res, next) => {
     if (req.isAuthenticated()){
         //if so, they can edit
         Campground.findById(req.params.id,(err, cg) => {
-            if (err){
-                console.log(err);
-                req.flash("error", err.message)
+            if (err || !cg){
+                if (err){
+                    console.log(err);
+                }
+                req.flash("error", "Campground not found");
                 return res.redirect("back");
             }
             else{
@@ -17,7 +19,7 @@ middleWareObj.checkCampgroundOwnership = (req, res, next) => {
                     next();
                 }
                 else{
-                    req.flash("error", "You don't have permissions to do that")
+                    req.flash("error", "You don't have permissions to do that!")
                     return res.redirect("back");
                 }
             }
@@ -34,7 +36,7 @@ middleWareObj.isLoggedIn = (req,res, next) => {
     if (req.isAuthenticated()){
         return next();
     }
-    req.flash("error", "You need to be logged in to do that");
+    req.flash("error", "You need to be logged in to do that!");
     return res.redirect("/login");
 }
 
@@ -53,9 +55,11 @@ middleWareObj.checkCommentOwnership = (req,res, next) => {
     if (req.isAuthenticated()){
         //if so, they can edit
         Comment.findById(req.params.comment_id,(err, comment) => {
-            if (err){
-                console.log(err);
-                req.flash("error",err.message);
+            if (err || !comment){
+                if (err){
+                    console.log(err);
+                }
+                req.flash("error","Comment not found");
                 return res.redirect("back");
             }
             else{
@@ -63,7 +67,7 @@ middleWareObj.checkCommentOwnership = (req,res, next) => {
                     next();
                 }
                 else{
-                    req.flash("error","You don't have permission to do that");
+                    req.flash("error","You don't have permission to do that!");
                     return res.redirect("back");
                 }
             }

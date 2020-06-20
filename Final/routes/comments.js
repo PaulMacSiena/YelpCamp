@@ -8,10 +8,12 @@ middleWareObj = require("../middleware");
 //create new comment form
 router.get("/new", middleWareObj.isLoggedIn, (req, res) => {
     Campground.findById(req.params.id,(err, campground) => {
-        if (err){
-            console.log(err);
-            req.flash("error",err.message);
-            return res.redirect("back");
+        if (err || !campground){
+            if (err){
+                console.log(err);
+            }
+            req.flash("error","Cannot post comment to unknown Campground");
+            return res.redirect("/campgrounds");
         }
         else{
             res.render("comments/new", {campground: campground});
@@ -23,9 +25,11 @@ router.get("/new", middleWareObj.isLoggedIn, (req, res) => {
 router.post("/", middleWareObj.isLoggedIn,(req,res) => {
     //lookup cg using id
     Campground.findById(req.params.id,(err,campground) => {
-        if (err){
-            console.log(err);
-            req.flash("error",err.message);
+        if (err || !campground){
+            if (err){
+                console.log(err);
+            }
+            req.flash("error","Cannot post comment to unknown Campground");
             return res.redirect("/campgrounds");
         }
         else{
@@ -54,24 +58,37 @@ router.post("/", middleWareObj.isLoggedIn,(req,res) => {
 
 // form to edit comment
 router.get("/:comment_id/edit", middleWareObj.checkCommentOwnership, (req, res) => {
-    Comment.findById(req.params.comment_id, (err, foundComment) => {
-        if (err){
-            console.log(err);
-            req.flash("error",err.message);
+    Campground.findById(req.params.id, (err, cg) => {
+        if (err || !cg){
+            if (err){
+                console.log(err);
+            }
+            req.flash("error","Campground not found");
             return res.redirect("back");
         }
-        else{
-            res.render("comments/edit",{campground_id: req.params.id, comment: foundComment});
-        }
+        Comment.findById(req.params.comment_id, (err, foundComment) => {
+            if (err || !foundComment){
+                if (err){
+                    console.log(err);
+                }
+                req.flash("error","Comment not found");
+                return res.redirect("back");
+            }
+            else{
+                res.render("comments/edit",{campground_id: req.params.id, comment: foundComment});
+            }
+        })
     })
 })
 
 // update comment
 router.put("/:comment_id", middleWareObj.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updateComment) => {
-        if (err){
-            console.log(err);
-            req.flash("error",err.message);
+        if (err || !updateComment){
+            if (err){
+                console.log(err);
+            }
+            req.flash("error","Could not find comment to edit");
             return res.redirect("back");
         }
         else{

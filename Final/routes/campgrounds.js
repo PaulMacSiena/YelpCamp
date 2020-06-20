@@ -8,10 +8,12 @@ middleWareObj = require("../middleware"); //index implicetly referenced
 router.get("/", (req,res) => {
     //get all campgrounds for db
     Campground.find({},(err,allCampgrounds) =>{
-        if (err){
-            console.log(err);
+        if (err || !allCampgrounds){
+            if (err){
+                console.log(err);
+            }
             req.flash("error", "Could not find any campgrounds")
-            return res.redirect("back");
+            return res.redirect("/");
         }
         else{
             res.render("campgrounds/index", {campgrounds: allCampgrounds});
@@ -40,7 +42,7 @@ router.post("/", middleWareObj.isLoggedIn, (req, res) =>{
         if (err){
             console.log(err);
             req.flash("error", "Could not create campground");
-            return res.redirect("back");
+            return res.redirect("/campgrounds");
         }
         else{
             console.log(newlyCreated);
@@ -58,10 +60,12 @@ router.get("/new", middleWareObj.isLoggedIn,(req, res) =>{
 router.get("/:id", (req,res) =>{
     //find the campground
     Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) =>{
-        if (err){
-            console.log(err);
-            req.flash("error","Campground not found");
-            return res.redirect("back");
+        if (err || !foundCampground){
+            if (err){
+                console.log(err);
+            }
+            req.flash("error","Campground with id: " +req.params.id +  " not found");
+            return res.redirect("/campgrounds");
         }
         else{
             //console.log(foundCampground);
@@ -76,10 +80,12 @@ router.get("/:id", (req,res) =>{
 router.get("/:id/edit", middleWareObj.checkCampgroundOwnership, (req, res) => {
     //if so, they can edit
     Campground.findById(req.params.id,(err, cg) => {
-        if (err){
-            console.log(err);
+        if (err || !cg){
+            if (err){
+                console.log(err);
+            }
             req.flash("error","Campground not found");
-            return res.redirect("back");
+            return res.redirect("/campgrounds");
         }
         res.render("campgrounds/edit",{cg: cg}); 
     })
@@ -88,7 +94,10 @@ router.get("/:id/edit", middleWareObj.checkCampgroundOwnership, (req, res) => {
 //update campground 
 router.put("/:id", middleWareObj.checkCampgroundOwnership, (req, res) => {
     Campground.findByIdAndUpdate(req.params.id,req.body.cg, (err, updatedCG) => {
-        if(err){
+        if(err || !updatedCG){
+            if (err){
+                console.log(err);
+            }
             req.flash("error","Campground not found");
             return res.redirect("/campgrounds");
         }
