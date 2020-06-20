@@ -66,20 +66,19 @@ router.get("/:id", (req,res) =>{
 })
 
 //edit form
-router.get("/:id/edit", (req, res) => {
+router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
+    //if so, they can edit
     Campground.findById(req.params.id,(err, cg) => {
         if (err){
             console.log(err);
-            res.redirect("/campgrounds/:id")
+            res.redirect("back");
         }
-        else{
-            res.render("campgrounds/edit",{cg: cg});
-        }
+        res.render("campgrounds/edit",{cg: cg}); 
     })
 })
 
-//update camground 
-router.put("/:id", (req, res) => {
+//update campground 
+router.put("/:id", checkCampgroundOwnership, (req, res) => {
     Campground.findByIdAndUpdate(req.params.id,req.body.cg, (err, updatedCG) => {
         if(err){
             res.redirect("/campgrounds");
@@ -91,7 +90,7 @@ router.put("/:id", (req, res) => {
 })
 
 //destroy cg
-router.delete("/:id", (req, res) => {
+router.delete("/:id", checkCampgroundOwnership,(req, res) => {
     Campground.findByIdAndDelete(req.params.id, (err) => {
         if (err){
             console.log(err);
@@ -99,6 +98,29 @@ router.delete("/:id", (req, res) => {
         res.redirect("/campgrounds");
     })
 })
+
+function checkCampgroundOwnership(req,res, next){
+    if (req.isAuthenticated()){
+        //if so, they can edit
+        Campground.findById(req.params.id,(err, cg) => {
+            if (err){
+                console.log(err);
+                res.redirect("back");
+            }
+            else{
+                if (cg.author.id.equals(req.user._id)){
+                    next();
+                }
+                else{
+                    res.redirect("back");
+                }
+            }
+        });
+    }
+    else{
+        res.redirect("back");
+    }
+}
 
 //middleware for checking authentication/ if user is logged in
 function isLoggedIn(req,res, next){
