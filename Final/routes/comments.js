@@ -2,10 +2,11 @@
 const express = require("express"),
 router = express.Router({mergeParams: true}),
 Campground = require("../models/campground"),
-Comment = require("../models/comment");
+Comment = require("../models/comment"),
+middleWareObj = require("../middleware");
 
 //create new comment form
-router.get("/new", isLoggedIn, (req, res) => {
+router.get("/new", middleWareObj.isLoggedIn, (req, res) => {
     Campground.findById(req.params.id,(err, campground) => {
         if (err){
             console.log(err);
@@ -17,7 +18,7 @@ router.get("/new", isLoggedIn, (req, res) => {
 })
 
 //post for new comment
-router.post("/", isLoggedIn,(req,res) => {
+router.post("/", middleWareObj.isLoggedIn,(req,res) => {
     //lookup cg using id
     Campground.findById(req.params.id,(err,campground) => {
         if (err){
@@ -46,7 +47,7 @@ router.post("/", isLoggedIn,(req,res) => {
 })
 
 // form to edit comment
-router.get("/:comment_id/edit", (req, res) => {
+router.get("/:comment_id/edit", middleWareObj.checkCommentOwnership, (req, res) => {
     Comment.findById(req.params.comment_id, (err, foundComment) => {
         if (err){
             console.log(err);
@@ -58,7 +59,8 @@ router.get("/:comment_id/edit", (req, res) => {
     })
 })
 
-router.put("/:comment_id", (req, res) => {
+// update comment
+router.put("/:comment_id", middleWareObj.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updateComment) => {
         if (err){
             console.log(err);
@@ -70,7 +72,7 @@ router.put("/:comment_id", (req, res) => {
     })
 })
 
-router.delete("/:comment_id", (req, res) => {
+router.delete("/:comment_id", middleWareObj.checkCommentOwnership,(req, res) => {
     Comment.findByIdAndRemove(req.params.comment_id, (err) => {
         if (err){
             console.log(err);
@@ -79,13 +81,5 @@ router.delete("/:comment_id", (req, res) => {
         res.redirect("/campgrounds/"+req.params.id);
     }) 
 })
-
-//middleware for checking authentication/ if user is logged in
-function isLoggedIn(req,res, next){
-    if (req.isAuthenticated()){
-        return next();
-    }
-    res.redirect("/login");
-}
 
 module.exports = router;
