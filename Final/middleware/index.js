@@ -9,20 +9,23 @@ middleWareObj.checkCampgroundOwnership = (req, res, next) => {
         Campground.findById(req.params.id,(err, cg) => {
             if (err){
                 console.log(err);
-                res.redirect("back");
+                req.flash("error", err.message)
+                return res.redirect("back");
             }
             else{
                 if (cg.author.id.equals(req.user._id)){
                     next();
                 }
                 else{
-                    res.redirect("back");
+                    req.flash("error", "You don't have permissions to do that")
+                    return res.redirect("back");
                 }
             }
         });
     }
     else{
-        res.redirect("back");
+        req.flash("error","You need to be logged in to do that!")
+        return res.redirect("back");
     }
 }
 
@@ -31,7 +34,8 @@ middleWareObj.isLoggedIn = (req,res, next) => {
     if (req.isAuthenticated()){
         return next();
     }
-    res.redirect("/login");
+    req.flash("error", "You need to be logged in to do that");
+    return res.redirect("/login");
 }
 
 //middleware to prevent users who are logged in from accessing register and login forms
@@ -40,7 +44,8 @@ middleWareObj.isLoggedOut = (req,res,next) => {
         return next();
     }
     else{
-        res.redirect("/campgrounds");
+        req.flash("error", "Cannot access the previous page while logged in")
+        return res.redirect("/campgrounds");
     }
 }
 
@@ -50,20 +55,23 @@ middleWareObj.checkCommentOwnership = (req,res, next) => {
         Comment.findById(req.params.comment_id,(err, comment) => {
             if (err){
                 console.log(err);
-                res.redirect("back");
+                req.flash("error",err.message);
+                return res.redirect("back");
             }
             else{
                 if (comment.author.id.equals(req.user._id)){
                     next();
                 }
                 else{
-                    res.redirect("back");
+                    req.flash("error","You don't have permission to do that");
+                    return res.redirect("back");
                 }
             }
         });
     }
     else{
-        res.redirect("back");
+        req.flash("error","You need to be logged in to do that");
+        return res.redirect("back");
     }
 }
 

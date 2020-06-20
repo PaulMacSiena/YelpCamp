@@ -6,6 +6,7 @@ const express = require("express"),
       passport = require("passport"),
       User = require("./models/user"),
       methodOverride = require("method-override"),
+      flash = require("connect-flash"),
       LocalStategy =require("passport-local");
 
 //set up routers
@@ -28,6 +29,9 @@ app.use(express.static(__dirname+'/public'));
 //method override for put and delete requests
 app.use(methodOverride("_method"));
 
+//use flash animation
+app.use(flash()); 
+
 //configure mongoose
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -37,7 +41,7 @@ mongoose.connect('mongodb://localhost/yelpcamp', {useNewUrlParser: true});
 
 //setup express session and passo
 app.use(require("express-session")({
-    secret: "Once again Rusty wins cutest dog",
+    secret: "Super secret secret!!",
     resave: false,
     saveUninitialized: false
 }))
@@ -52,6 +56,8 @@ passport.deserializeUser(User.deserializeUser());
 //make currentUser available to all responses
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 })
 

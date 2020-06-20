@@ -10,6 +10,8 @@ router.get("/", (req,res) => {
     Campground.find({},(err,allCampgrounds) =>{
         if (err){
             console.log(err);
+            req.flash("error", "Could not find any campgrounds")
+            return res.redirect("back");
         }
         else{
             res.render("campgrounds/index", {campgrounds: allCampgrounds});
@@ -37,6 +39,8 @@ router.post("/", middleWareObj.isLoggedIn, (req, res) =>{
     Campground.create(newCG, (err, newlyCreated) =>{
         if (err){
             console.log(err);
+            req.flash("error", "Could not create campground");
+            return res.redirect("back");
         }
         else{
             console.log(newlyCreated);
@@ -56,6 +60,8 @@ router.get("/:id", (req,res) =>{
     Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) =>{
         if (err){
             console.log(err);
+            req.flash("error","Campground not found");
+            return res.redirect("back");
         }
         else{
             //console.log(foundCampground);
@@ -72,7 +78,8 @@ router.get("/:id/edit", middleWareObj.checkCampgroundOwnership, (req, res) => {
     Campground.findById(req.params.id,(err, cg) => {
         if (err){
             console.log(err);
-            res.redirect("back");
+            req.flash("error","Campground not found");
+            return res.redirect("back");
         }
         res.render("campgrounds/edit",{cg: cg}); 
     })
@@ -82,7 +89,8 @@ router.get("/:id/edit", middleWareObj.checkCampgroundOwnership, (req, res) => {
 router.put("/:id", middleWareObj.checkCampgroundOwnership, (req, res) => {
     Campground.findByIdAndUpdate(req.params.id,req.body.cg, (err, updatedCG) => {
         if(err){
-            res.redirect("/campgrounds");
+            req.flash("error","Campground not found");
+            return res.redirect("/campgrounds");
         }
         else{
             res.redirect("/campgrounds/" + req.params.id)
@@ -95,11 +103,10 @@ router.delete("/:id", middleWareObj.checkCampgroundOwnership,(req, res) => {
     Campground.findByIdAndDelete(req.params.id, (err) => {
         if (err){
             console.log(err);
+            req.flash("error","Could not delete campground");
         }
-        res.redirect("/campgrounds");
+        return res.redirect("/campgrounds");
     })
 })
-
-
 
 module.exports = router;  
