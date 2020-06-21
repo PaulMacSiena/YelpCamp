@@ -25,6 +25,7 @@ router.get("/", (req,res) => {
 router.post("/", middleWareObj.isLoggedIn, (req, res) =>{
     //get data from form and add to campgrounds array
     let name = req.body.name;
+    let price = req.body.price;
     let image = req.body.image;
     let description = req.body.description;
     let author = {
@@ -33,6 +34,7 @@ router.post("/", middleWareObj.isLoggedIn, (req, res) =>{
     }
     let newCG = {
         name: name,
+        price: price,
         image: image,
         description: description,
         author: author
@@ -56,7 +58,7 @@ router.get("/new", middleWareObj.isLoggedIn,(req, res) =>{
     res.render("campgrounds/new");
 });
 
-//SHOW: show info about campgroudn
+//SHOW: show info about campground
 router.get("/:id", (req,res) =>{
     //find the campground
     Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) =>{
