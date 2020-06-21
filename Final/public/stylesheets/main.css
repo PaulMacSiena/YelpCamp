@@ -9,3 +9,12 @@
 .deleteForm{
     display: inline;
 }
+
+.yelp-form{
+    width: 30%; 
+    margin: 25px auto;
+}
+
+.form-header{
+    text-align: center;
+}

@@ -48,7 +48,7 @@ router.post("/", middleWareObj.isLoggedIn, (req, res) =>{
         }
         else{
             console.log(newlyCreated);
-            res.redirect("/campgrounds");
+            res.redirect("/campgrounds/" + newlyCreated._id);
         }
     })
 })
@@ -104,7 +104,7 @@ router.put("/:id", middleWareObj.checkCampgroundOwnership, (req, res) => {
             return res.redirect("/campgrounds");
         }
         else{
-            res.redirect("/campgrounds/" + req.params.id)
+            res.redirect("/campgrounds/" + updatedCG._id)
         }
     })
 })
