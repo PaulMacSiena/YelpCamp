@@ -33,11 +33,13 @@ app.use(methodOverride("_method"));
 app.use(flash()); 
 
 //configure mongoose
+/*
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect('mongodb://localhost/yelpcamp', {useNewUrlParser: true});
+*/
 
 //setup express session and passo
 app.use(require("express-session")({
